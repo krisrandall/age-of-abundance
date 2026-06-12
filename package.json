@@ -1,0 +1,17 @@
+{
+  "name": "age-of-abundance",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Age of Abundance — public explainers for Open Government and the Affordable Housing Company.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.0"
+  }
+}

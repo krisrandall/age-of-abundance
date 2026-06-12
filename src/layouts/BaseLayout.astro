@@ -1,0 +1,90 @@
+---
+import Nav from '../components/Nav.astro';
+import '../styles/global.css';
+
+// Works both as an Astro component layout (props) and as a Markdown layout
+// (Markdown frontmatter arrives under Astro.props.frontmatter).
+const fm = Astro.props.frontmatter ?? Astro.props;
+const isMarkdown = Astro.props.frontmatter !== undefined;
+
+const title = fm.title ?? 'Age of Abundance';
+const description =
+  fm.description ??
+  'Practical projects for a world where everyone has the basics — secure housing, open and honest government.';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const fullTitle = title === 'Age of Abundance' ? title : `${title} · Age of Abundance`;
+
+// ---- Pillar navigation (keeps Markdown files free of base-aware links) ----
+const PILLARS = {
+  'open-government': {
+    label: 'Open Government',
+    sections: [
+      { slug: 'summary', title: 'The idea', href: `${base}/open-government` },
+      { slug: 'how-it-works', title: 'How it works', href: `${base}/open-government/how-it-works` },
+      { slug: 'template', title: 'Clone your own', href: `${base}/open-government/template` },
+    ],
+  },
+  'affordable-housing': {
+    label: 'Affordable Housing Company',
+    sections: [
+      { slug: 'summary', title: 'Overview', href: `${base}/affordable-housing` },
+      { slug: 'the-model', title: 'The model', href: `${base}/affordable-housing/the-model` },
+      { slug: 'governance-legal', title: 'Governance & legal', href: `${base}/affordable-housing/governance-legal` },
+      { slug: 'pathway', title: 'The pathway', href: `${base}/affordable-housing/pathway` },
+      { slug: 'faq', title: 'FAQ', href: `${base}/affordable-housing/faq` },
+    ],
+  },
+};
+
+const pillar = fm.pillar ? PILLARS[fm.pillar] : null;
+const sections = pillar?.sections ?? [];
+const currentIndex = sections.findIndex((s) => s.slug === fm.section);
+const next = currentIndex >= 0 ? sections[currentIndex + 1] : undefined;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <Nav />
+    <main>
+      {isMarkdown ? (
+        <article class="prose container">
+          {pillar && <p class="eyebrow">{pillar.label}</p>}
+          <h1>{title}</h1>
+          {fm.lede && <p class="lede">{fm.lede}</p>}
+          {sections.length > 0 && (
+            <nav class="subnav" aria-label={`${pillar.label} sections`}>
+              {sections.map((s) => (
+                <a href={s.href} aria-current={s.slug === fm.section ? 'page' : undefined}>{s.title}</a>
+              ))}
+            </nav>
+          )}
+          <slot />
+          {next && (
+            <div class="next-links">
+              <a href={next.href}>Next: {next.title} →</a>
+            </div>
+          )}
+        </article>
+      ) : (
+        <slot />
+      )}
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <span>Age of Abundance — an evolving project by Kris.</span>
+        <span><a href={`${base}/`}>Home</a></span>
+      </div>
+    </footer>
+  </body>
+</html>

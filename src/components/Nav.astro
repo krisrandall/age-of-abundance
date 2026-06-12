@@ -1,0 +1,26 @@
+---
+// Site-wide top navigation. Links are base-aware via import.meta.env.BASE_URL
+// so they resolve correctly under the GitHub Pages /age-of-abundance/ path.
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const here = Astro.url.pathname.replace(/\/$/, '');
+
+const links = [
+  { href: `${base}/open-government`, label: 'Open Government' },
+  { href: `${base}/affordable-housing`, label: 'Affordable Housing' },
+];
+
+function current(href) {
+  const h = href.replace(/\/$/, '');
+  return here === h || here.startsWith(h + '/') ? 'page' : undefined;
+}
+---
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href={`${base}/`}>Age of <span>Abundance</span></a>
+    <nav class="nav-links" aria-label="Primary">
+      {links.map((l) => (
+        <a href={l.href} aria-current={current(l.href)}>{l.label}</a>
+      ))}
+    </nav>
+  </div>
+</header>

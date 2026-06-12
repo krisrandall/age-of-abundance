@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PillarCard from '../components/PillarCard.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<BaseLayout title="Age of Abundance" description="In the age of AI, far more is possible. Practical projects for a world where everyone has the basics — and government tells the truth.">
+  <section class="container hero">
+    <p class="eyebrow">A project about the world we could choose</p>
+    <h1>The Age of Abundance</h1>
+    <p class="lede">
+      In the age of AI, far more is possible than ever before. We could build a world where
+      everyone has the basics — a secure home, enough food, real access to education and health
+      care — and where government is honest about what it stands for.
+    </p>
+    <p class="lede" style="font-size:1.05rem;">
+      This site holds two practical projects working toward that. One is about how we
+      <strong>govern</strong>. The other is about how we <strong>house</strong> each other.
+    </p>
+  </section>
+
+  <section class="container">
+    <div class="pillars">
+      <PillarCard
+        href={`${base}/open-government`}
+        eyebrow="Project 1 · How we govern"
+        title="Open Government"
+        body="Publicly state the world you want and the priorities you hold — then let anyone check whether the laws you support actually match. A simple antidote to spin, and a foundation for a truth era."
+        cta="Read the idea →"
+      />
+      <PillarCard
+        href={`${base}/affordable-housing`}
+        eyebrow="Project 2 · How we house"
+        title="Affordable Housing Company"
+        body="A group pools cash to buy a rental home outright — no debt — through a shared company and unit trust. It opens property to ordinary people and takes a home out of the speculative market."
+        cta="See the model →"
+      />
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="callout">
+      <span class="callout-title">A core belief running through both</span>
+      <p>
+        Government's first duty is to the people who would otherwise miss out — not to give a leg-up
+        to those already winning. A society is failing when it does the latter. Both projects here are
+        attempts to take real action toward the former.
+      </p>
+    </div>
+    <p style="color:var(--text-soft); font-size:0.95rem;">
+      Age of Abundance is an evolving personal project by Kris. These pages explain each idea simply,
+      then drill all the way down into how it could actually be done. You're welcome to take any of it
+      and make it your own.
+    </p>
+  </section>
+</BaseLayout>
