@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{show_title}}</title>
+  <meta name="description" content="{{show_title}} — a podcast. {{episode_count}} episodes.">
+  <link rel="alternate" type="application/rss+xml" title="{{show_title}}" href="{{feed_url}}">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="{{cover_url}}">
+  <meta property="og:title" content="{{show_title}}">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{{site_url}}{{cover_url}}">
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="{{home_url}}">← {{home_label}}</a><a href="{{feed_url}}">RSS feed</a></div>
+  <header class="head">
+    <img src="{{cover_url}}" alt="{{show_title}} cover art">
+    <div>
+      <h1>{{show_title}}</h1>
+      <div class="desc">{{show_description_html}}</div>
+      <p class="note">{{status_note_html}}</p>
+      <div class="subs">{{subscribe_html}}</div>
+    </div>
+  </header>
+  <main>
+    <ul class="eps">
+{{episodes_html}}
+    </ul>
+  </main>
+  <footer>© {{year}} · <a href="{{home_url}}">{{home_label}}</a> · <a href="{{feed_url}}">RSS</a></footer>
+</div>
+</body>
+</html>

@@ -34,6 +34,6 @@ feedgen (string assembly gives byte-for-byte control over CDATA and tag order). 
 anything is a new entry here.
 
 ## 2026-09-14 — The new show's cover art is a placeholder
-`podcast/shows/age-of-abundance/art/cover.jpg` is generated from the site's colours and
-wordmark so the pipeline runs end to end. It is replaced with real art before the show is
+`podcast/shows/age-of-abundance/art/cover.jpg` is generated (Pillow, the site's colours and
+wordmark) so the pipeline runs end to end. It is replaced with real art before the show is
 submitted to any directory (`ops/LAUNCH-age-of-abundance.md`).

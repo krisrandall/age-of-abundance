@@ -1,0 +1,28 @@
+# The Age of Abundance podcast. See ../../FORMATS.md for every key.
+# [Kris: the description and categories below are drafted from the site's own words — edit freely]
+title: Age of Abundance
+hostname: podcast.age-of-abundance.org
+status: prelaunch
+description: |
+  Conversations on the way to an age of abundance: how we govern, how we house ourselves, and
+  what becomes possible when everyone has the basics.
+
+  Hosted by Kris Randall. Part of https://age-of-abundance.org
+language: en
+copyright: Kris Randall 2026
+license: Kris Randall 2026
+author: Kris Randall
+owner_name: Kris Randall
+owner_email: ''
+explicit: false
+type: episodic
+medium: podcast
+guid: c288092f-fa8d-5f76-921b-3a906cbdc122
+locked: true
+categories:
+  - [Society & Culture, Philosophy]
+  - [Government]
+cover: cover.jpg
+home_url: https://age-of-abundance.org/
+home_label: Age of Abundance
+status_note: First episodes 2027.

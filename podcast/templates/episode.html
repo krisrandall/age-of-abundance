@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}} — {{show_title}}</title>
+  <meta name="description" content="{{show_title}}, episode {{number}}: {{title}}">
+  <link rel="alternate" type="application/rss+xml" title="{{show_title}}" href="{{feed_url}}">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="{{cover_url}}">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="{{site_url}}{{image_url}}">
+  <meta property="og:audio" content="{{site_url}}{{audio_url}}">
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="/">← {{show_title}}</a><a href="{{home_url}}">{{home_label}}</a></div>
+  <main>
+    <h1>{{title}}</h1>
+    <p class="meta">Episode {{number}} · {{date}} · {{duration}}</p>
+    <img class="art-big" src="{{image_url}}" alt="">
+    <audio controls preload="none" src="{{audio_url}}"></audio>
+    <p class="meta"><a href="{{audio_url}}">Download the mp3</a></p>
+    <div class="desc">{{description_html}}</div>
+    {{youtube_html}}
+  </main>
+  <footer>© {{year}} · <a href="{{home_url}}">{{home_label}}</a> · <a href="{{feed_url}}">RSS</a></footer>
+</div>
+</body>
+</html>

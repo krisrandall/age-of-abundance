@@ -1,0 +1,35 @@
+# The Unfinished Cubby (2021–2023), preserved. Imported from rss.com on 2026-09-14; the copy of
+# that feed in import/ is what `pod.py check` compares against. See ../../FORMATS.md.
+title: The Unfinished Cubby
+hostname: podcast.cocreations.com.au
+status: archive
+description: |
+  Finding balance in your many life aspirations.
+
+  The Unfinished Cubby is a Podcast by Kris Randall, the founder of CoCreations,
+  About running a business; raising a family; philosophy, purpose, & meaning; and creating & maintaining a healthy & happy work-life balance.
+language: en
+copyright: Kris Randall 2021
+license: Kris Randall 2021
+author: Kris Randall
+owner_name: Kris Randall
+owner_email: ''
+explicit: false
+type: episodic
+medium: podcast
+guid: 687dd84e-27fd-5616-82f2-a9d39c7ed26e
+locked: true
+categories:
+  - [Society & Culture, Philosophy]
+  - [Business, Entrepreneurship]
+cover: cover.jpg
+home_url: https://age-of-abundance.org/podcast
+home_label: Age of Abundance
+status_note: An archive. Eighteen conversations, 2021–2023.
+apple_url: https://podcasts.apple.com/au/podcast/the-unfinished-cubby/id1560437668
+spotify_url: https://open.spotify.com/show/3yzUfgj77WO2DHue10B0lV
+pocketcasts_url: https://pca.st/ptrvpxg3
+amazon_url: https://music.amazon.co.uk/podcasts/501c9299-3a14-4d4d-a3c3-789908e7e0f5
+youtube_url: https://www.youtube.com/channel/UCoIaiJMA2bIzL773vV8i-yw
+old_feed_url: https://media.rss.com/unfinishedcubby/feed.xml
+old_site_url: https://rss.com/podcasts/unfinishedcubby
