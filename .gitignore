@@ -1,19 +1,21 @@
-# build output
+# build output (site/dist, podcast/public)
 dist/
-# generated types
 .astro/
+podcast/public/
 # dependencies
 node_modules/
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+__pycache__/
+*.pyc
+# secrets: the Oracle API key, the server ssh key. Copies live in 1Password. Never `git add -f`.
+.secrets/
+# podcast audio: 1.7 GB and growing; the laptop and the server are the copies
+podcast/shows/*/media/
 # environment variables
 .env
 .env.production
-# macOS
+# logs
+npm-debug.log*
+# macOS / editors
 .DS_Store
-# editor
 .vscode/
 .idea/

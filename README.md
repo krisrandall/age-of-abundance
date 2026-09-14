@@ -1,66 +1,35 @@
 # Age of Abundance
 
-Public explainers for two practical projects toward a world where everyone has the basics:
+A world where everyone has the basics. In the age of AI, far more is possible — this project
+is the public home for the practical pieces of that:
 
-1. **Open Government** — publicly declare the world you want and the priorities you hold, so anyone can
-   check whether the laws you support actually match. A foundation for a truth era.
-2. **The Affordable Housing Company** — a group pools cash to buy a rental home outright (no debt)
-   through a shared company + unit trust, opening property to ordinary people and taking a home out of
-   the speculative market.
+1. **Open Government** — publicly declare the world you want and the priorities you hold, so
+   anyone can check whether the laws you support actually match. A foundation for a truth era.
+2. **The Affordable Housing Company** — a group pools cash to buy a rental home outright (no
+   debt) through a shared company + unit trust, opening property to ordinary people and taking
+   a home out of the speculative market.
+3. **The podcast** — conversations on the way there. First episodes 2027.
 
-Built as a small [Astro](https://astro.build) static site. All the words live in plain **Markdown**
-under `src/pages/` so they're easy to edit and fork.
+Site: https://age-of-abundance.org (until the domain is switched on, https://krisrandall.github.io/age-of-abundance/).
+
+## Map
+
+- `site/` — the Astro site. All the words live in plain Markdown under `site/src/pages/`.
+  Deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`.
+- `podcast/` — the podcast service: two shows (`shows/age-of-abundance`, and the preserved
+  archive of *The Unfinished Cubby* in `shows/unfinished-cubby`), one script (`pod.py`) that
+  builds each show's RSS feed and pages and puts them on our own server. See `podcast/FORMATS.md`.
+- `ops/` — the server (Oracle Cloud, Caddy), DNS records, the runbooks. Kris-only.
+- `release/` — reserved for a later helper that turns a recording into a released episode.
+- `WHY.md` → `CLAUDE.md` → `DECISIONS.md` — read in that order before changing anything.
 
 ## Run it locally
 
 ```bash
-npm install
-npm run dev      # http://localhost:4321/age-of-abundance/
+# the site
+cd site && npm install && npm run dev        # http://localhost:4321/
+
+# the podcast feeds
+cd podcast && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python pod.py build && .venv/bin/python pod.py check && .venv/bin/python pod.py serve
 ```
-
-Other commands:
-
-```bash
-npm run build    # static output → dist/
-npm run preview  # serve the built dist/ locally
-```
-
-## Edit the content
-
-Each page is a Markdown file under `src/pages/`. The page heading, sub-navigation, and "next" link are
-driven by the frontmatter (`title`, `lede`, `pillar`, `section`) and rendered by
-`src/layouts/BaseLayout.astro` — so you only ever edit prose, never navigation plumbing.
-
-```
-src/pages/
-├── index.astro                     # home
-├── open-government/
-│   ├── index.md                    # the idea (summary)
-│   ├── how-it-works.md
-│   └── template.md                 # "clone your own" (roadmap sketch)
-└── affordable-housing/
-    ├── index.md                    # overview (summary)
-    ├── the-model.md
-    ├── governance-legal.md
-    ├── pathway.md
-    └── faq.md
-```
-
-## Deploy (GitHub Pages)
-
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds and deploys to GitHub Pages.
-
-**One-time setup:** in the repo on GitHub, go to **Settings → Pages → Build and deployment → Source**
-and choose **GitHub Actions**.
-
-The site is configured in `astro.config.mjs` for a project site at
-`https://krisrandall.github.io/age-of-abundance/`. If you add a custom domain later, set `base: '/'`
-and update `site` accordingly.
-
-## Roadmap
-
-- Build the actual clonable **Open Government** template repository (currently sketched on the site).
-
----
-
-*Content is general information, not financial or legal advice.*
