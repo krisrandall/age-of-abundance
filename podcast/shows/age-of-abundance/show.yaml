@@ -4,6 +4,7 @@ title: Age of Abundance
 site_url: https://krisrandall.github.io/age-of-abundance/podcast   # the feed is <site_url>/feed.xml
 audio_base_url: https://github.com/krisrandall/age-of-abundance/releases/download/audio-age-of-abundance
 audio_release: audio-age-of-abundance
+publish_dir: site/public/podcast     # beside the site's own /podcast page (relative to the repo root)
 index_page: false                          # the site's own podcast page (site/src/pages/podcast/index.md) is the index
 status: prelaunch
 description: |

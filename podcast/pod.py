@@ -271,7 +271,7 @@ class Show:
     def audio_release(self) -> str: return str(self.cfg.get("audio_release", ""))
     @property
     def publish_dir(self) -> Path:
-        return Path(str(self.cfg["publish_dir"])) if self.cfg.get("publish_dir") else SITE_PUBLIC / self.slug
+        return (REPO / str(self.cfg["publish_dir"])) if self.cfg.get("publish_dir") else SITE_PUBLIC / self.slug
     @property
     def writes_index(self) -> bool: return bool(self.cfg.get("index_page", True))
     @property
@@ -879,26 +879,27 @@ def check_image(path: Path, who: str) -> list[str]:
 def http_req(method: str, url: str, headers: dict | None = None, timeout: int = 60):
     """(status, headers, body) of the FINAL response after redirects, via curl. Body only for GET."""
     need("curl")
-    cmd = ["curl", "-sS", "-L", "--max-time", str(timeout), "-A", "pod.py check", "-D", "-"]
+    cmd = ["curl", "-sS", "-L", "--max-time", str(timeout), "-A", "pod.py check"]
     for k, v in (headers or {}).items():
         cmd += ["-H", f"{k}: {v}"]
     body_file = None
     if method == "HEAD":
-        cmd += ["-I"]
+        cmd += ["-I"]                       # -I already prints every hop's headers
     else:
         body_file = tempfile.NamedTemporaryFile(delete=False)
         body_file.close()
-        cmd += ["-o", body_file.name]
+        cmd += ["-D", "-", "-o", body_file.name]
     r = run(cmd + [url])
     if r.returncode != 0:
         return 0, {"error": r.stderr.strip()[:200]}, b""
-    blocks = [b for b in re.split(r"\r?\n\r?\n", r.stdout.strip()) if b.startswith("HTTP/")]
-    if not blocks:
+    lines = r.stdout.splitlines()
+    starts = [i for i, l in enumerate(lines) if l.startswith("HTTP/")]
+    if not starts:
         return 0, {"error": "no response"}, b""
-    lines = blocks[-1].splitlines()
-    status = int(lines[0].split()[1])
+    last = lines[starts[-1]:]
+    status = int(last[0].split()[1])
     hd = {}
-    for line in lines[1:]:
+    for line in last[1:]:
         if ":" in line:
             k, v = line.split(":", 1)
             hd[k.strip().lower()] = v.strip()

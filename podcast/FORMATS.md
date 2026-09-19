@@ -28,7 +28,7 @@ audio_base_url: https://github.com/krisrandall/age-of-abundance/releases/downloa
                                          # Omit it to serve them from <site_url>/media/ on a server of our own.
 audio_release: audio-age-of-abundance    # the release tag `deploy` uploads to
 index_page: false                        # true (default) writes index.html; false when the site has its own page
-publish_dir: ../site/public/age-of-abundance   # optional; default site/public/<show>/
+publish_dir: site/public/podcast         # optional, relative to the repo root; default site/public/<show>/
 status: prelaunch                        # prelaunch | live | archive — a note to humans; archive
                                          #   also means "no new episodes" (check enforces it)
 description: |                           # plain text; blank line = new paragraph
