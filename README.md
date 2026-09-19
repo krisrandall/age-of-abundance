@@ -8,7 +8,7 @@ is the public home for the practical pieces of that:
 2. **The Affordable Housing Company** — a group pools cash to buy a rental home outright (no
    debt) through a shared company + unit trust, opening property to ordinary people and taking
    a home out of the speculative market.
-3. **The podcast** — conversations on the way there. First episodes 2027.
+3. **The podcast** — conversations on the way there, one day. The feed exists; no episodes yet.
 
 Site: https://age-of-abundance.org (until the domain is switched on, https://krisrandall.github.io/age-of-abundance/).
 
@@ -20,7 +20,7 @@ Site: https://age-of-abundance.org (until the domain is switched on, https://kri
   archive of *The Unfinished Cubby* in `shows/unfinished-cubby`), one script (`pod.py`) that
   builds each show's RSS feed and pages into `site/public/` and puts the mp3s on a GitHub
   release. No server. See `podcast/FORMATS.md`.
-- `ops/` — the runbook, the Cubby cutover and the 2027 launch checklist.
+- `ops/` — the runbook, the record of how The Unfinished Cubby moved, notes on the directories.
 - `release/` — reserved for a later helper that turns a recording into a released episode.
 - `WHY.md` → `CLAUDE.md` → `DECISIONS.md` — read in that order before changing anything.
 

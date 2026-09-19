@@ -2,7 +2,7 @@
 layout: ../../layouts/BaseLayout.astro
 title: The Podcast
 description: Conversations on the way to an age of abundance — how we govern, how we house ourselves, and what becomes possible when everyone has the basics.
-lede: Conversations on the way there — with the people trying things. First episodes in 2027.
+lede: Conversations on the way there — with the people trying things. One day.
 pillar: podcast
 section: summary
 ---
@@ -19,7 +19,7 @@ Subscribe by pasting the feed address into any podcast app:
 https://krisrandall.github.io/age-of-abundance/podcast/feed.xml
 ```
 
-Links for Apple Podcasts, Spotify and the rest will appear here once the show is listed.
+There are no episodes yet. Links for Apple Podcasts, Spotify and the rest come with the listing, one day.
 
 ## The Unfinished Cubby
 

@@ -51,3 +51,10 @@ the traffic (a few downloads a day), `audio_base_url` moves the files and the fe
 `…/age-of-abundance/unfinished-cubby/feed.xml`. Reverses the 2026-09-14 "two permanent feed
 URLs" entry: with no server there is no `podcast.` subdomain, and Kris does not care about
 the domain names now. The old rss.com feed will 301 to the Cubby one (cutover doc).
+
+## 2026-09-19 — The Unfinished Cubby has moved; Age of Abundance the show is an idea for one day
+Kris placed the rss.com redirect the same day the new feed went live (verified 301; record in
+`ops/UNFINISHED-CUBBY-MOVE.md`), so the December 2026 deadline of the 2026-09-14 entry is met
+and gone. The first Age of Abundance conversation (with Simon) was published standalone on
+SoundCloud and Medium, not as an episode; the show's feed stays empty and unlisted until the
+show exists. The docs carry records and notes now, not schedules.

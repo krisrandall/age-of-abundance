@@ -50,7 +50,7 @@ categories:                              # Apple's list; [main, sub] or [main]
 cover: cover.jpg                         # in art/
 home_url: https://age-of-abundance.org/  # the "← back" link on the pages
 home_label: Age of Abundance
-status_note: First episodes 2027.        # shown under the description; may be empty
+status_note: No episodes yet.            # shown under the description; may be empty
 apple_url: …                             # subscribe buttons: any of apple_url, spotify_url,
 spotify_url: …                           #   pocketcasts_url, amazon_url, youtube_url; RSS is
 old_feed_url: …                          #   always added. old_* are for archives (cutover checks).

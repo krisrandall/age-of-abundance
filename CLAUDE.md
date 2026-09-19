@@ -7,7 +7,7 @@ procedure for a session. Keep it under 80 lines.
 Kris's public project: a small Astro site (https://krisrandall.github.io/age-of-abundance/,
 age-of-abundance.org later) and a podcast service with no server at all — feeds and pages on
 GitHub Pages, mp3s as GitHub Release assets — serving two shows: the new *Age of Abundance*
-show (`…/age-of-abundance/podcast/feed.xml`, launching 2027) and the preserved archive of
+show (`…/age-of-abundance/podcast/feed.xml`, an idea for one day; no episodes yet) and the preserved archive of
 *The Unfinished Cubby* (`…/age-of-abundance/unfinished-cubby/feed.xml`, 18 episodes, 2021–2023).
 
 ## Map
@@ -21,8 +21,9 @@ show (`…/age-of-abundance/podcast/feed.xml`, launching 2027) and the preserved
   never in git. The contract is `podcast/FORMATS.md`. `build` writes `podcast/public/`
   (ignored); `deploy` uploads new mp3s to the release, copies the feed and pages into
   `site/public/<show>/` (committed — that is how they publish) and pushes.
-- `ops/` — the runbook (where things live, how to move them), the Cubby cutover and the
-  2027 launch checklist. No secrets anywhere: `gh` is signed in on the laptop.
+- `ops/` — the runbook (where things live, how to move them), the record of how The
+  Unfinished Cubby moved off rss.com, notes on the directories. No secrets anywhere:
+  `gh` is signed in on the laptop.
 - `release/` — placeholder for the later recording-to-release helper. Nothing there yet.
 - `DECISIONS.md` — append-only.
 
@@ -43,7 +44,7 @@ show (`…/age-of-abundance/podcast/feed.xml`, launching 2027) and the preserved
 7. Kris's words. Site copy, show descriptions and episode notes are his; placeholders look
    like `[Kris: what goes here]`. Draft from his existing words when asked, say so, and flag it.
 8. Never touch a podcast directory (Apple, Spotify, rss.com) without Kris. Those clicks are
-   his, and they are in `ops/CUTOVER-unfinished-cubby.md` and `ops/LAUNCH-age-of-abundance.md`.
+   his; `ops/DIRECTORIES.md` says what each one asks for.
 9. `WHY.md` ≤ 40 lines, this file ≤ 80. Words here are paid for by every future session.
 
 ## A session (any agent: laptop, task runner, or otherwise)

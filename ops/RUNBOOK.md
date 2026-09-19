@@ -30,8 +30,8 @@ Addresses (permanent — never change them; a custom domain later gives a 301 fr
 
 1. the laptop: `podcast/shows/<show>/media/` (gitignored);
 2. the GitHub release (public);
-3. optional, for posterity: the Internet Archive (`pip install internetarchive`, `ia upload`).
-   Not done yet; a good idea for an archive show.
+3. the Internet Archive would make a third (`pip install internetarchive`, `ia upload`) —
+   a note, not a plan.
 
 ## If GitHub ever objects to serving the audio
 
@@ -44,5 +44,5 @@ feed URL does not change, so nobody re-subscribes; already-downloaded episodes a
 
 `site/astro.config.mjs` (`site`, `base: '/'`), `site/public/CNAME`, the Pages custom-domain
 setting, the DNS records at Namecheap. GitHub then 301-redirects the github.io addresses,
-which podcast apps follow — but do it before or well after the rss.com redirect, never the
-same week, so only one redirect is settling at a time.
+which podcast apps follow. The rss.com redirect settled in September 2026, so nothing
+constrains the timing any more.
