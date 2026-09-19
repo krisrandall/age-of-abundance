@@ -66,7 +66,7 @@ Cubby in your podcast app".
 ## Where the show is listed
 
 The rss.com feed was `https://media.rss.com/unfinishedcubby/feed.xml`; the new one is
-`https://krisrandall.github.io/age-of-abundance/unfinished-cubby/feed.xml` (see `../../ops/CUTOVER-unfinished-cubby.md`).
+`https://krisrandall.github.io/age-of-abundance/unfinished-cubby/feed.xml` (see `../../ops/UNFINISHED-CUBBY-MOVE.md`).
 
 | Directory | Account | Share URL |
 |---|---|---|
