@@ -4,10 +4,11 @@ Read `WHY.md` first. This file is a router: what lives where, who may change wha
 procedure for a session. Keep it under 80 lines.
 
 ## What this is
-Kris's public project: a small Astro site (https://age-of-abundance.org) and a self-hosted
-podcast service serving two shows — the new *Age of Abundance* show
-(https://podcast.age-of-abundance.org/feed.xml, launching 2027) and the preserved archive of
-*The Unfinished Cubby* (https://podcast.cocreations.com.au/feed.xml, 18 episodes, 2021–2023).
+Kris's public project: a small Astro site (https://krisrandall.github.io/age-of-abundance/,
+age-of-abundance.org later) and a podcast service with no server at all — feeds and pages on
+GitHub Pages, mp3s as GitHub Release assets — serving two shows: the new *Age of Abundance*
+show (`…/age-of-abundance/podcast/feed.xml`, launching 2027) and the preserved archive of
+*The Unfinished Cubby* (`…/age-of-abundance/unfinished-cubby/feed.xml`, 18 episodes, 2021–2023).
 
 ## Map
 - `site/` — Astro 4. Words are Markdown under `site/src/pages/`; frontmatter (`title`, `lede`,
@@ -16,24 +17,27 @@ podcast service serving two shows — the new *Age of Abundance* show
   Pushed to `main` → live on GitHub Pages in about a minute.
 - `podcast/` — the feed service. `pod.py` is the whole tool (`import | new | build | check |
   deploy | serve`, each with `--show`). `shows/<show>/show.yaml` + `episodes/*.html` +
-  `art/` are the content; `media/` (the mp3s) is on disk only, never in git. The contract is
-  `podcast/FORMATS.md`. Build output goes to `podcast/public/` (ignored).
-- `ops/` — the Oracle server, Caddy config, DNS, runbooks, the Cubby cutover and the 2027
-  launch checklist. `.secrets/` (ignored) holds the Oracle API key and the server ssh key.
+  `art/` are the content; `media/` (the mp3s) is on disk and on the show's GitHub release,
+  never in git. The contract is `podcast/FORMATS.md`. `build` writes `podcast/public/`
+  (ignored); `deploy` uploads new mp3s to the release, copies the feed and pages into
+  `site/public/<show>/` (committed — that is how they publish) and pushes.
+- `ops/` — the runbook (where things live, how to move them), the Cubby cutover and the
+  2027 launch checklist. No secrets anywhere: `gh` is signed in on the laptop.
 - `release/` — placeholder for the later recording-to-release helper. Nothing there yet.
 - `DECISIONS.md` — append-only.
 
 ## Rules (each carries the incident it came from)
 1. A published feed URL, episode URL, media filename or `guid:` never changes. Apple and
    Spotify key episodes on the GUID; a changed one shows every listener a duplicate.
-2. Media is never committed. `podcast/shows/*/media/` is 1.7 GB and grows; git would choke
-   and the public repo would republish it. The laptop and the server are the copies.
-3. `.secrets/` is never committed and never `git add -f`'d. This repo is public. `pod.py
-   check` fails if anything under `.secrets/` is tracked.
+2. Media is never committed to git. `podcast/shows/*/media/` is 1.7 GB and grows; git would
+   choke. The laptop and the GitHub release are the copies (`deploy` keeps the release complete).
+3. A release asset is never replaced or renamed (`deploy` refuses): its URL is in every
+   listener's app. A fixed recording is a new file name and a new episode file.
 4. `pod.py check` must pass before `deploy`, and `deploy` runs it. It refuses `[Kris:`
    placeholders, so a half-written episode cannot ship.
-5. Static only on the server: files and Caddy. No app process, no cron, no database.
-   (2026-08-10/11/12: three long-lived watchers died silently on the task-runner host.)
+5. No server. Files on GitHub Pages and GitHub Releases; nothing to keep alive.
+   (2026-08-10/11/12: three long-lived watchers died silently on the task-runner host;
+   2026-09-19: the Oracle free tier would not cooperate and was parked.)
 6. Pinned dependencies; adding one needs a `DECISIONS.md` entry. (2026-08-10: an unpinned
    MCP library broke every container on the task-runner platform in one rebuild.)
 7. Kris's words. Site copy, show descriptions and episode notes are his; placeholders look
@@ -50,7 +54,8 @@ podcast service serving two shows — the new *Age of Abundance* show
    python3 -m unittest && python3 pod.py check` must pass.
 4. Commit as you go: `site: …`, `podcast: …`, `ops: …`, `docs: …`. A session never ends
    with uncommitted work. Never force-push.
-5. Push. The site deploys itself; the feeds deploy only when someone runs `pod.py deploy`.
+5. Push. The site deploys itself; a feed changes only when someone runs `pod.py deploy`
+   (which commits `site/public/<show>/` and pushes).
 6. Reply in plain words with the link to what changed.
 
 ## Releasing an episode (Kris, from the laptop)
@@ -58,4 +63,4 @@ podcast service serving two shows — the new *Age of Abundance* show
     python3 pod.py new --show age-of-abundance --mp3 ~/path/to/recording.mp3 \
         --title "Topic - Guest Name" --guest "Guest Name"      # prints the file to edit
     # write the description in that file, then:
-    python3 pod.py build && python3 pod.py check && python3 pod.py deploy
+    python3 pod.py deploy --show age-of-abundance      # builds, checks, uploads, publishes, checks live

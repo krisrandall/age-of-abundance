@@ -1,6 +1,6 @@
 # Age of Abundance — putting the show in the directories (2027)
 
-The feed is live from the first deploy at `https://podcast.age-of-abundance.org/feed.xml`,
+The feed is live from the first deploy at `https://krisrandall.github.io/age-of-abundance/podcast/feed.xml`,
 just not listed anywhere. Episodes can be published to it at any time (`pod.py new` →
 `build` → `check` → `deploy`) and the page link shared. Listing it is a separate, one-day
 job, once:

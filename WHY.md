@@ -23,10 +23,9 @@ When a choice comes down to it, decide in this order:
    would move one, it is wrong.
 2. Nothing locked inside a service. Every episode, description and setting is a plain file in
    this repo (audio beside it on disk); the server holds only copies. History is the undo.
-3. Nothing to keep alive. Static files and a web server, no app process, no cron, no
-   database. A thing that does not run cannot die.
-4. Free to run. The site is on GitHub Pages, the feeds on a free-tier server. A cost must be
-   argued for in `DECISIONS.md`.
+3. Nothing to keep alive. Plain files on GitHub Pages and GitHub Releases: no server, no
+   process, no cron, no database. A thing that does not run cannot die.
+4. Free to run. A cost must be argued for in `DECISIONS.md`.
 5. Kris's time. Assume and proceed on small things; ask when it costs money, cannot be
    undone, is public-facing, or touches a listing in a podcast directory.
 

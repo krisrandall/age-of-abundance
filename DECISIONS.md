@@ -37,3 +37,17 @@ anything is a new entry here.
 `podcast/shows/age-of-abundance/art/cover.jpg` is generated (Pillow, the site's colours and
 wordmark) so the pipeline runs end to end. It is replaced with real art before the show is
 submitted to any directory (`ops/LAUNCH-age-of-abundance.md`).
+
+## 2026-09-19 — No server: GitHub Pages for the feeds, GitHub Releases for the audio
+Reverses the Oracle decision of 2026-09-14 (Kris: "oracle is not playing nice"; parked). A feed
+needs only a static file and permanent, range-capable mp3 URLs; Pages gives the first, a
+release's assets the second (2 GB each, no sign-up, no card, no idle rule). Not SoundCloud
+(3 free hours, no stable direct URLs, its own feed = lock-in again). Feed addresses are the
+github.io ones for good; a custom domain later adds a 301 on top. If GitHub ever objected to
+the traffic (a few downloads a day), `audio_base_url` moves the files and the feed URL stays.
+
+## 2026-09-19 — Two feed addresses, both under the site
+`https://krisrandall.github.io/age-of-abundance/podcast/feed.xml` and
+`…/age-of-abundance/unfinished-cubby/feed.xml`. Reverses the 2026-09-14 "two permanent feed
+URLs" entry: with no server there is no `podcast.` subdomain, and Kris does not care about
+the domain names now. The old rss.com feed will 301 to the Cubby one (cutover doc).

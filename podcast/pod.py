@@ -5,11 +5,11 @@
     pod.py new    --show S --mp3 FILE --title "Topic - Guest" --guest "Guest" [--image FILE] [--draft]
     pod.py build  [--show S]          episodes -> public/<show>/feed.xml + pages
     pod.py check  [--show S] [--live] everything that must be true before (and after) a deploy
-    pod.py deploy [--show S]          build, check, rsync to the server, check --live
+    pod.py deploy [--show S]          build, check, mp3s to the GitHub release, pages into site/public, push, check --live
     pod.py serve  [--port 8000]       look at public/ locally
 
 Plain files in, plain files out. The contract for shows/ is FORMATS.md. Stdlib + PyYAML;
-shells out to curl, ffprobe, rsync, xmllint. See ../WHY.md for the order of
+shells out to curl, ffprobe, rsync, xmllint, gh. See ../WHY.md for the order of
 trade-offs and ../CLAUDE.md for the rules.
 """
 from __future__ import annotations
@@ -40,7 +40,7 @@ REPO = ROOT.parent
 SHOWS = ROOT / "shows"
 PUBLIC = ROOT / "public"
 TEMPLATES = ROOT / "templates"
-SERVER_ENV = REPO / "ops" / "server.env"
+SITE_PUBLIC = REPO / "site" / "public"     # the Astro site's verbatim-copied folder: the built shows go here
 SECRETS = REPO / ".secrets"
 GENERATOR = "age-of-abundance pod.py"
 
@@ -218,7 +218,7 @@ class Episode:
     @property
     def link(self) -> str: return f"{self.show.site_url}/episodes/{self.slug}/"
     @property
-    def audio_url(self) -> str: return f"{self.show.site_url}/media/{self.audio.name}"
+    def audio_url(self) -> str: return f"{self.show.audio_base_url}/{self.audio.name}"
     @property
     def image_url(self) -> str:
         return f"{self.show.site_url}/art/{self.image.name}" if self.image else self.show.cover_url
@@ -249,9 +249,31 @@ class Show:
     @property
     def title(self) -> str: return str(self.cfg.get("title", self.slug))
     @property
-    def hostname(self) -> str: return str(self.cfg["hostname"])
+    def site_url(self) -> str:
+        """Where the feed and pages live, no trailing slash. May carry a path (GitHub Pages)."""
+        if self.cfg.get("site_url"):
+            return str(self.cfg["site_url"]).rstrip("/")
+        if self.cfg.get("hostname"):
+            return f"https://{self.cfg['hostname']}"
+        raise Fail(f"{self.slug}/show.yaml: site_url is missing")
     @property
-    def site_url(self) -> str: return f"https://{self.hostname}"
+    def base_path(self) -> str:
+        """The path part of site_url ('' or '/age-of-abundance/unfinished-cubby'), for links inside pages."""
+        return re.sub(r"^https?://[^/]+", "", self.site_url).rstrip("/")
+    @property
+    def audio_base_url(self) -> str:
+        """Where the mp3s are fetched from. Default: a media/ folder beside the feed (a server of our own);
+        a GitHub release ('https://github.com/<owner>/<repo>/releases/download/<tag>') needs no server."""
+        return str(self.cfg.get("audio_base_url") or f"{self.site_url}/media").rstrip("/")
+    @property
+    def serves_media_itself(self) -> bool: return not self.cfg.get("audio_base_url")
+    @property
+    def audio_release(self) -> str: return str(self.cfg.get("audio_release", ""))
+    @property
+    def publish_dir(self) -> Path:
+        return Path(str(self.cfg["publish_dir"])) if self.cfg.get("publish_dir") else SITE_PUBLIC / self.slug
+    @property
+    def writes_index(self) -> bool: return bool(self.cfg.get("index_page", True))
     @property
     def feed_url(self) -> str: return f"{self.site_url}/feed.xml"
     @property
@@ -337,7 +359,7 @@ def cmd_import(args) -> None:
             cats.append([c.get("text", "")] + ([sub.get("text", "")] if sub is not None else []))
         cfg = {
             "title": t(ch, "title"),
-            "hostname": args.hostname or f"podcast.example.org",
+            "site_url": args.site_url or "https://example.org/podcast",
             "status": "archive",
             "description": t(ch, "description"),
             "language": t(ch, "language", "en"),
@@ -357,7 +379,7 @@ def cmd_import(args) -> None:
             "old_site_url": t(ch, "link"),
         }
         yaml_mod().safe_dump(cfg, open(cfg_path, "w", encoding="utf-8"), sort_keys=False, allow_unicode=True, width=1000)
-        say(f"wrote {rel(cfg_path)} — set hostname and check the words")
+        say(f"wrote {rel(cfg_path)} — set site_url (and audio_base_url) and check the words")
     else:
         say(f"{rel(cfg_path)} exists, left alone")
 
@@ -634,7 +656,7 @@ def cmd_build(args) -> None:
         out = show.public
         (out / "episodes").mkdir(parents=True, exist_ok=True)
         (out / "art").mkdir(exist_ok=True)
-        # art is copied (small, in git); media is a symlink to the show's folder (large, on disk)
+        # art is copied (small, in git); media is a symlink to the show's folder only when we serve it ourselves
         for p in show.art.glob("*"):
             if p.is_file():
                 shutil.copy2(p, out / "art" / p.name)
@@ -644,7 +666,9 @@ def cmd_build(args) -> None:
                 link.unlink()
             else:
                 shutil.rmtree(link)
-        link.symlink_to(os.path.relpath(show.media, out))
+        if show.serves_media_itself:
+            link.symlink_to(os.path.relpath(show.media, out))
+        base = show.base_path
         durations = {e.guid: e.duration() for e in eps}
         (out / "feed.xml").write_text(feed_xml(show, eps, built), encoding="utf-8")
         css = (TEMPLATES / "style.css").read_text(encoding="utf-8")
@@ -654,7 +678,9 @@ def cmd_build(args) -> None:
         common = {
             "show_title": show.title,
             "show_description_html": "".join(f"<p>{html.escape(p.strip())}</p>" for p in str(show.cfg.get("description", "")).split("\n\n") if p.strip()),
-            "cover_url": "/art/" + show.cover.name,
+            "base": base,
+            "cover_url": f"{base}/art/{show.cover.name}",
+            "cover_abs": show.cover_url,
             "feed_url": show.feed_url,
             "site_url": show.site_url,
             "subscribe_html": subscribe_links_html(show),
@@ -672,9 +698,10 @@ def cmd_build(args) -> None:
                 "number": e.number,
                 "date": e.published.strftime("%-d %B %Y"),
                 "duration": human_duration(durations[e.guid]),
-                "audio_url": "/media/" + e.audio.name,
-                "image_url": "/art/" + (e.image.name if e.image else show.cover.name),
-                "link": f"/episodes/{e.slug}/",
+                "audio_url": e.audio_url,
+                "image_url": f"{base}/art/" + (e.image.name if e.image else show.cover.name),
+                "image_abs": e.image_url,
+                "link": f"{base}/episodes/{e.slug}/",
                 "description_html": e.body,
                 "youtube_url": str(e.fm.get("youtube") or ""),
                 "youtube_html": (f'<p><a href="{html.escape(str(e.fm["youtube"]), quote=True)}">Watch on YouTube</a></p>' if e.fm.get("youtube") else ""),
@@ -690,7 +717,10 @@ def cmd_build(args) -> None:
             '<audio controls preload="none" src="{audio_url}"></audio></div></li>'.format(
                 **{k: html.escape(str(v), quote=True) for k, v in i.items() if not k.endswith("_html")})
             for i in items)
-        (out / "index.html").write_text(render(index_t, {**common, "episodes_html": list_html, "episode_count": len(items)}), encoding="utf-8")
+        if show.writes_index:
+            (out / "index.html").write_text(render(index_t, {**common, "episodes_html": list_html, "episode_count": len(items)}), encoding="utf-8")
+        elif (out / "index.html").exists():
+            (out / "index.html").unlink()
         # keep public/<show>/episodes free of pages for episodes that no longer exist
         want = {e.slug for e in eps}
         for d in (out / "episodes").iterdir():
@@ -716,7 +746,7 @@ def check_show(show: Show, live: bool) -> list[str]:
         bad.append("files under .secrets/ are tracked by git: " + r.stdout.strip().replace("\n", ", "))
 
     # the show itself
-    for key in ("title", "hostname", "description", "author", "guid", "categories"):
+    for key in ("title", "description", "author", "guid", "categories"):
         if not show.cfg.get(key):
             bad.append(f"show.yaml: {key} is empty")
     if PLACEHOLDER in str(show.cfg.get("description", "")):
@@ -846,16 +876,37 @@ def check_image(path: Path, who: str) -> list[str]:
     return bad
 
 
-def http_req(method: str, url: str, headers: dict | None = None, timeout: int = 30):
-    req = urllib.request.Request(url, method=method, headers={"User-Agent": "pod.py check", **(headers or {})})
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            body = resp.read() if method == "GET" else b""
-            return resp.status, {k.lower(): v for k, v in resp.headers.items()}, body
-    except urllib.error.HTTPError as ex:
-        return ex.code, {k.lower(): v for k, v in ex.headers.items()}, b""
-    except (urllib.error.URLError, TimeoutError, OSError) as ex:
-        return 0, {"error": str(ex)}, b""
+def http_req(method: str, url: str, headers: dict | None = None, timeout: int = 60):
+    """(status, headers, body) of the FINAL response after redirects, via curl. Body only for GET."""
+    need("curl")
+    cmd = ["curl", "-sS", "-L", "--max-time", str(timeout), "-A", "pod.py check", "-D", "-"]
+    for k, v in (headers or {}).items():
+        cmd += ["-H", f"{k}: {v}"]
+    body_file = None
+    if method == "HEAD":
+        cmd += ["-I"]
+    else:
+        body_file = tempfile.NamedTemporaryFile(delete=False)
+        body_file.close()
+        cmd += ["-o", body_file.name]
+    r = run(cmd + [url])
+    if r.returncode != 0:
+        return 0, {"error": r.stderr.strip()[:200]}, b""
+    blocks = [b for b in re.split(r"\r?\n\r?\n", r.stdout.strip()) if b.startswith("HTTP/")]
+    if not blocks:
+        return 0, {"error": "no response"}, b""
+    lines = blocks[-1].splitlines()
+    status = int(lines[0].split()[1])
+    hd = {}
+    for line in lines[1:]:
+        if ":" in line:
+            k, v = line.split(":", 1)
+            hd[k.strip().lower()] = v.strip()
+    body = b""
+    if body_file:
+        body = Path(body_file.name).read_bytes()
+        os.unlink(body_file.name)
+    return status, hd, body
 
 
 def check_live(show: Show, items, ch) -> list[str]:
@@ -864,8 +915,9 @@ def check_live(show: Show, items, ch) -> list[str]:
     st, hd, body = http_req("GET", show.feed_url)
     if st != 200:
         return [f"live: GET {show.feed_url} -> {st} {hd.get('error', '')}"]
-    if not hd.get("content-type", "").startswith("application/rss+xml"):
-        bad.append(f"live: feed content-type is {hd.get('content-type')!r}, want application/rss+xml")
+    ctype = hd.get("content-type", "")
+    if not (ctype.startswith("application/rss+xml") or ctype.startswith("application/xml") or ctype.startswith("text/xml")):
+        bad.append(f"live: feed content-type is {ctype!r}, want an XML type")
     if body != local:
         bad.append("live: the feed on the server differs from public/feed.xml (deploy)")
     for it in items:
@@ -875,8 +927,10 @@ def check_live(show: Show, items, ch) -> list[str]:
         if st != 200:
             bad.append(f"live: HEAD {url} -> {st} {hd.get('error', '')}")
             continue
-        if hd.get("content-type") != "audio/mpeg":
-            bad.append(f"live: {Path(url).name} content-type {hd.get('content-type')!r}")
+        ctype = hd.get("content-type", "")
+        # GitHub serves release assets as application/octet-stream; apps go by the enclosure's type attribute
+        if not (ctype.startswith("audio/mpeg") or ctype.startswith("application/octet-stream")):
+            bad.append(f"live: {Path(url).name} content-type {ctype!r}")
         if hd.get("accept-ranges") != "bytes":
             bad.append(f"live: {Path(url).name} does not advertise byte ranges")
         if hd.get("content-length") != enc.get("length"):
@@ -901,9 +955,10 @@ def check_live(show: Show, items, ch) -> list[str]:
         st, _, _ = http_req("HEAD", cover.get("href"))
         if st != 200:
             bad.append(f"live: HEAD {cover.get('href')} -> {st}")
-    st, hd, _ = http_req("HEAD", show.site_url + "/")
-    if st != 200 or not hd.get("content-type", "").startswith("text/html"):
-        bad.append(f"live: HEAD {show.site_url}/ -> {st} {hd.get('content-type', '')}")
+    if show.writes_index:
+        st, hd, _ = http_req("HEAD", show.site_url + "/")
+        if st != 200 or not hd.get("content-type", "").startswith("text/html"):
+            bad.append(f"live: HEAD {show.site_url}/ -> {st} {hd.get('content-type', '')}")
     return bad
 
 
@@ -923,39 +978,82 @@ def cmd_check(args) -> None:
 
 
 # ----------------------------------------------------------------------------- deploy
-def server_target() -> tuple[str, str]:
-    if not SERVER_ENV.exists():
-        raise Fail(f"{SERVER_ENV} is missing (ops/oci/provision.sh writes it)")
-    env = dict(re.findall(r"^\s*([A-Z_]+)\s*=\s*\"?([^\"\n]*)\"?\s*$", SERVER_ENV.read_text(), re.M))
-    host = env.get("PODCAST_HOST")
-    if not host:
-        raise Fail("PODCAST_HOST is not set in ops/server.env")
-    key = os.environ.get("PODCAST_SSH_KEY") or str(SECRETS / "podcast_server_key")
-    if not Path(key).exists():
-        raise Fail(f"ssh key not found: {key}")
-    return host, key
+def release_assets(tag: str) -> dict[str, int]:
+    r = run(["gh", "release", "view", tag, "--repo", repo_slug(), "--json", "assets"])
+    if r.returncode != 0:
+        raise Fail(f"no GitHub release tagged {tag} ({r.stderr.strip()[:200]}); create it: gh release create {tag} --title ...")
+    return {a["name"]: int(a["size"]) for a in json.loads(r.stdout)["assets"]}
+
+
+def repo_slug() -> str:
+    r = run(["git", "-C", str(REPO), "remote", "get-url", "origin"])
+    m = re.search(r"github\.com[:/]([^/]+/[^/.]+)", r.stdout)
+    if not m:
+        raise Fail("origin is not a GitHub remote")
+    return m.group(1)
+
+
+def push_audio(show: Show, eps: list[Episode]) -> None:
+    """Every episode's mp3 as an asset of the show's release; already-present files are left alone."""
+    need("gh")
+    if not show.audio_release:
+        raise Fail(f"{show.slug}: audio_release (the GitHub release tag) is not set in show.yaml")
+    have = release_assets(show.audio_release)
+    for e in eps:
+        name, size = e.audio.name, e.length
+        if name in have and have[name] == size:
+            continue
+        if name in have:
+            raise Fail(f"{show.slug}: {name} is on the release with a different size ({have[name]} vs {size}); "
+                       "a published file is never replaced — fix the local copy or use a new file name")
+        say(f"{show.slug}: uploading {name} ({size // 1_000_000} MB) to release {show.audio_release}")
+        r = subprocess.run(["gh", "release", "upload", show.audio_release, str(e.audio), "--repo", repo_slug()])
+        if r.returncode != 0:
+            raise Fail(f"{show.slug}: upload of {name} failed")
+    have = release_assets(show.audio_release)
+    missing = [e.audio.name for e in eps if have.get(e.audio.name) != e.length]
+    if missing:
+        raise Fail(f"{show.slug}: not on the release with the right size: {', '.join(missing)}")
 
 
 def cmd_deploy(args) -> None:
     need("rsync")
-    host, key = server_target()
-    ssh = f"ssh -i {key} -o StrictHostKeyChecking=accept-new"
     cmd_build(args)
     cmd_check(argparse.Namespace(show=args.show, live=False))
-    for show in pick_shows(args.show):
-        remote = f"{host}:/var/www/podcast/{show.slug}"
-        say(f"{show.slug}: media -> {remote}/media/")
-        r = subprocess.run(["rsync", "-rt", "--chmod=D755,F644", "--partial", "--partial-dir=.rsync-partial",
-                            "--info=progress2", "-e", ssh, f"{show.media}/", f"{remote}/media/"])
+    shows = pick_shows(args.show)
+    for show in shows:
+        eps = show.episodes()
+        if show.serves_media_itself:
+            raise Fail(f"{show.slug}: no audio_base_url — this deploy publishes through GitHub; "
+                       "set audio_base_url/audio_release in show.yaml")
+        push_audio(show, eps)
+        dest = show.publish_dir
+        dest.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(["rsync", "-rt", "--delete", "--exclude=/media", f"{show.public}/", f"{dest}/"])
         if r.returncode != 0:
-            raise Fail(f"{show.slug}: media rsync failed ({r.returncode})")
-        say(f"{show.slug}: feed and pages -> {remote}/")
-        r = subprocess.run(["rsync", "-rt", "--chmod=D755,F644", "--delete", "--exclude=/media",
-                            "--exclude=/.rsync-partial", "-e", ssh, f"{show.public}/", f"{remote}/"])
-        if r.returncode != 0:
-            raise Fail(f"{show.slug}: site rsync failed ({r.returncode})")
-    say("deployed; checking the live site")
-    time.sleep(1)
+            raise Fail(f"{show.slug}: copying the built pages into {rel(dest)} failed")
+        say(f"{show.slug}: pages and feed -> {dest.relative_to(REPO)}")
+    paths = [str(s.publish_dir) for s in shows]
+    run(["git", "-C", str(REPO), "add", "-A", *paths])
+    if run(["git", "-C", str(REPO), "diff", "--cached", "--quiet", "--", *paths]).returncode == 0:
+        say("nothing new to publish (the site already has this build)")
+    else:
+        msg = "podcast: publish " + ", ".join(s.slug for s in shows)
+        if run(["git", "-C", str(REPO), "commit", "-q", "-m", msg, "--", *paths]).returncode != 0:
+            raise Fail("commit failed")
+        if run(["git", "-C", str(REPO), "push", "-q"]).returncode != 0:
+            raise Fail("push failed — the pages are committed locally; push by hand")
+        say("pushed; GitHub Pages rebuilds the site in a minute or two")
+    # wait for the live feed to match, then run the full live check
+    for show in shows:
+        local = (show.public / "feed.xml").read_bytes()
+        for _ in range(30):
+            st, _, body = http_req("GET", show.feed_url)
+            if st == 200 and body == local:
+                break
+            time.sleep(10)
+        else:
+            say(f"{show.slug}: the live feed still differs after five minutes; check GitHub Actions")
     cmd_check(argparse.Namespace(show=args.show, live=True))
 
 
@@ -983,7 +1081,7 @@ def main(argv=None) -> None:
     s = sub.add_parser("import", help="pull a show off its old host (one-off, idempotent)")
     s.add_argument("--show", required=True)
     s.add_argument("--from", dest="source", required=True, help="feed URL or a saved feed file")
-    s.add_argument("--hostname", help="the new show's hostname, written into show.yaml")
+    s.add_argument("--site-url", help="where the feed will live, written into show.yaml")
     s.add_argument("--force", action="store_true", help="overwrite episode files that exist")
     s.add_argument("--no-media", action="store_true", help="metadata only, no downloads")
     s.set_defaults(fn=cmd_import)
@@ -1007,7 +1105,7 @@ def main(argv=None) -> None:
     s.set_defaults(fn=cmd_new)
 
     for name, fn, hlp in (("build", cmd_build, "write feed.xml and pages to public/<show>/"),
-                          ("deploy", cmd_deploy, "build, check, rsync to the server, check --live")):
+                          ("deploy", cmd_deploy, "build, check, audio to the GitHub release, pages into site/, push, check --live")):
         s = sub.add_parser(name, help=hlp)
         s.add_argument("--show")
         s.set_defaults(fn=fn)

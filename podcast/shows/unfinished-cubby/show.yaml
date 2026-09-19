@@ -1,7 +1,9 @@
 # The Unfinished Cubby (2021–2023), preserved. Imported from rss.com on 2026-09-14; the copy of
 # that feed in import/ is what `pod.py check` compares against. See ../../FORMATS.md.
 title: The Unfinished Cubby
-hostname: podcast.cocreations.com.au
+site_url: https://krisrandall.github.io/age-of-abundance/unfinished-cubby   # the feed is <site_url>/feed.xml — permanent
+audio_base_url: https://github.com/krisrandall/age-of-abundance/releases/download/audio-unfinished-cubby
+audio_release: audio-unfinished-cubby      # the GitHub release the mp3s are assets of
 status: archive
 description: |
   Finding balance in your many life aspirations.

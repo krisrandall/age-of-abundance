@@ -5,14 +5,14 @@ while the subscription is active; directories need weeks to follow a redirect. N
 about this is urgent, and nothing here is undone easily, so one step at a time.
 
 Old feed: `https://media.rss.com/unfinishedcubby/feed.xml`
-New feed: `https://podcast.cocreations.com.au/feed.xml`
+New feed: `https://krisrandall.github.io/age-of-abundance/unfinished-cubby/feed.xml`
 
 ## Before touching rss.com (the session does these)
 
 1. `cd podcast && python3 pod.py check --show unfinished-cubby --live` is green: 18
    episodes, every GUID, title and number identical to the copy of the old feed in
-   `shows/unfinished-cubby/import/`, every mp3 the same size as rss.com's, byte ranges
-   working.
+   `shows/unfinished-cubby/import/`, every mp3 on the GitHub release the same size as
+   rss.com's, byte ranges working.
 2. The feed passes both public validators with no errors:
    https://castfeedvalidator.com and https://podba.se/validate
 3. Kris subscribes by URL in Pocket Casts (Discover → search box → paste the URL) and in
@@ -23,7 +23,7 @@ New feed: `https://podcast.cocreations.com.au/feed.xml`
 
 4. https://dashboard.rss.com/podcasts/unfinishedcubby/settings/ → **Copy Protection →
    Disable Protection** (it must be off before a redirect).
-5. Same page → **Redirect My Podcast** → paste `https://podcast.cocreations.com.au/feed.xml`
+5. Same page → **Redirect My Podcast** → paste `https://krisrandall.github.io/age-of-abundance/unfinished-cubby/feed.xml`
    → **Redirect my show**.
 6. Never click **Delete my podcast**. Never publish an episode on rss.com again. Leave the
    subscription alone; it lapses in April 2027 by itself.
@@ -46,7 +46,7 @@ New feed: `https://podcast.cocreations.com.au/feed.xml`
     Stitcher no longer exist.
 12. Later, separately: the episode descriptions still link to
     `https://rss.com/podcasts/unfinishedcubby/`, which dies with the account. Replacing
-    those links with `https://podcast.cocreations.com.au/` is one commit; it changes the
+    those links with `https://krisrandall.github.io/age-of-abundance/unfinished-cubby/` is one commit; it changes the
     words listeners see, so it is Kris's call.
 
 ## Never

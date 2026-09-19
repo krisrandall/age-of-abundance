@@ -13,12 +13,10 @@ Long conversations, one guest at a time, about the practical side of a world whe
 has the basics: how we govern, how we house each other, and what becomes possible in the age
 of AI when the basics are taken care of.
 
-The show lives at **[podcast.age-of-abundance.org](https://podcast.age-of-abundance.org/)**,
-where every episode can be played or downloaded. Subscribe by pasting the feed address into
-any podcast app:
+Subscribe by pasting the feed address into any podcast app:
 
 ```
-https://podcast.age-of-abundance.org/feed.xml
+https://krisrandall.github.io/age-of-abundance/podcast/feed.xml
 ```
 
 Links for Apple Podcasts, Spotify and the rest will appear here once the show is listed.
@@ -28,4 +26,4 @@ Links for Apple Podcasts, Spotify and the rest will appear here once the show is
 Before this there was *The Unfinished Cubby* (2021–2023): eighteen conversations on
 running a business, raising a family, philosophy, purpose and meaning, and finding a
 healthy work-life balance. The whole archive is kept, playable, at
-[podcast.cocreations.com.au](https://podcast.cocreations.com.au/).
+[its own page](/age-of-abundance/unfinished-cubby/).

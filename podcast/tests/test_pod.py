@@ -70,7 +70,7 @@ class EndToEnd(unittest.TestCase):
         show = pod.SHOWS / "testshow"
         (show / "art").mkdir(parents=True)
         (show / "show.yaml").write_text(
-            "title: Test Show\nhostname: podcast.example.org\ndescription: Just a test.\nauthor: A\n"
+            "title: Test Show\nsite_url: https://podcast.example.org\ndescription: Just a test.\nauthor: A\n"
             "guid: 11111111-1111-5111-8111-111111111111\ncategories:\n  - [Government]\n"
             "home_url: https://example.org/\n", encoding="utf-8")
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "color=c=0x2f6f5e:s=1400x1400",

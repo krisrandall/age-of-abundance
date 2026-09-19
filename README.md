@@ -18,8 +18,9 @@ Site: https://age-of-abundance.org (until the domain is switched on, https://kri
   Deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`.
 - `podcast/` — the podcast service: two shows (`shows/age-of-abundance`, and the preserved
   archive of *The Unfinished Cubby* in `shows/unfinished-cubby`), one script (`pod.py`) that
-  builds each show's RSS feed and pages and puts them on our own server. See `podcast/FORMATS.md`.
-- `ops/` — the server (Oracle Cloud, Caddy), DNS records, the runbooks. Kris-only.
+  builds each show's RSS feed and pages into `site/public/` and puts the mp3s on a GitHub
+  release. No server. See `podcast/FORMATS.md`.
+- `ops/` — the runbook, the Cubby cutover and the 2027 launch checklist.
 - `release/` — reserved for a later helper that turns a recording into a released episode.
 - `WHY.md` → `CLAUDE.md` → `DECISIONS.md` — read in that order before changing anything.
 
@@ -31,5 +32,5 @@ cd site && npm install && npm run dev        # http://localhost:4321/
 
 # the podcast feeds
 cd podcast && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python pod.py build && .venv/bin/python pod.py check && .venv/bin/python pod.py serve
+.venv/bin/python pod.py build && .venv/bin/python pod.py check && .venv/bin/python pod.py serve   # or: cd site && npm run dev
 ```

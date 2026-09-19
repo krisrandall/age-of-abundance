@@ -1,7 +1,10 @@
 # The Age of Abundance podcast. See ../../FORMATS.md for every key.
 # [Kris: the description and categories below are drafted from the site's own words — edit freely]
 title: Age of Abundance
-hostname: podcast.age-of-abundance.org
+site_url: https://krisrandall.github.io/age-of-abundance/podcast   # the feed is <site_url>/feed.xml
+audio_base_url: https://github.com/krisrandall/age-of-abundance/releases/download/audio-age-of-abundance
+audio_release: audio-age-of-abundance
+index_page: false                          # the site's own podcast page (site/src/pages/podcast/index.md) is the index
 status: prelaunch
 description: |
   Conversations on the way to an age of abundance: how we govern, how we house ourselves, and

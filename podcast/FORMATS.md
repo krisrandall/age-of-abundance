@@ -15,14 +15,20 @@ import/          (archives only) the feed the show was imported from; `check` pr
                  GUIDs, titles and numbers still match it. Delete it to stop that check.
 ```
 
-`<show>` is lowercase letters, digits and hyphens. It is also the folder on the server
-(`/var/www/podcast/<show>/`) and under `public/`.
+`<show>` is lowercase letters, digits and hyphens. It is also the folder under `public/` and,
+by default, under `site/public/` where `deploy` puts the built feed and pages.
 
 ## `show.yaml`
 
 ```
 title: Age of Abundance
-hostname: podcast.age-of-abundance.org   # the feed is https://<hostname>/feed.xml, pages under /
+site_url: https://krisrandall.github.io/age-of-abundance/podcast   # the feed is <site_url>/feed.xml; pages under it. PERMANENT.
+audio_base_url: https://github.com/krisrandall/age-of-abundance/releases/download/audio-age-of-abundance
+                                         # where the mp3s are fetched from (a GitHub release: no server).
+                                         # Omit it to serve them from <site_url>/media/ on a server of our own.
+audio_release: audio-age-of-abundance    # the release tag `deploy` uploads to
+index_page: false                        # true (default) writes index.html; false when the site has its own page
+publish_dir: ../site/public/age-of-abundance   # optional; default site/public/<show>/
 status: prelaunch                        # prelaunch | live | archive — a note to humans; archive
                                          #   also means "no new episodes" (check enforces it)
 description: |                           # plain text; blank line = new paragraph
@@ -80,7 +86,7 @@ rsscom_url: https://…            # provenance for imported episodes; ignored o
 
 Derived at build and never stored: the enclosure `length` (the mp3's size), its `type`
 (`audio/mpeg` — only .mp3 is served), `itunes:duration` (ffprobe), the item `link`
-(`https://<hostname>/episodes/<slug>/`) and the media and art URLs.
+(`<site_url>/episodes/<slug>/`) and the media (`<audio_base_url>/<file>`) and art URLs.
 
 `check` refuses: a description that is empty or still holds `[Kris:`; more than 4000
 characters; tags outside the list above; a duplicate guid or episode number; a pubdate in
